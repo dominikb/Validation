@@ -244,7 +244,7 @@ class MyRule extends AbstractRule
 }
 ```
 
-If you do want Validation to execute you rule (or rules) in the chain, you must
+If you do want Validation to execute your rule (or rules) in the chain, you must
 use `v::with()` passing your rule's namespace as an argument:
 
 ```php
