@@ -9,59 +9,66 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
+use stdClass;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Slug
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\Slug
+ *
+ * @author Carlos André Ferrari <caferrari@gmail.com>
+ * @author Danilo Correa <danilosilva87@gmail.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Marcel dos Santos <marcelgsantos@gmail.com>
  */
-class SlugTest extends TestCase
+final class SlugTest extends RuleTestCase
 {
     /**
-     * @dataProvider providerValidSlug
+     * {@inheritDoc}
      */
-    public function testValidSlug($input)
+    public function providerForValidInput(): array
     {
-        $rule = new Slug();
+        $sut = new Slug();
 
-        $this->assertTrue($rule->validate($input));
-    }
-
-    /**
-     * @dataProvider providerInvalidSlug
-     */
-    public function testInvalidSlug($input)
-    {
-        $rule = new Slug();
-
-        $this->assertFalse($rule->validate($input));
-    }
-
-    public function providerValidSlug()
-    {
         return [
-            ['o-rato-roeu-o-rei-de-roma'],
-            ['o-alganet-e-um-feio'],
-            ['a-e-i-o-u'],
-            ['anticonstitucionalissimamente'],
+            [$sut, 'o-rato-roeu-o-rei-de-roma'],
+            [$sut, 'o-alganet-e-um-feio'],
+            [$sut, 'a-e-i-o-u'],
+            [$sut, 'anticonstitucionalissimamente'],
         ];
     }
 
-    public function providerInvalidSlug()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
+        $sut = new Slug();
+
         return [
-            [''],
-            ['o-alganet-é-um-feio'],
-            ['á-é-í-ó-ú'],
-            ['-assim-nao-pode'],
-            ['assim-tambem-nao-'],
-            ['nem--assim'],
-            ['--nem-assim'],
-            ['Nem mesmo Assim'],
-            ['Ou-ate-assim'],
-            ['-Se juntar-tudo-Então-'],
+            [$sut, ''],
+            [$sut, 'o-alganet-é-um-feio'],
+            [$sut, 'á-é-í-ó-ú'],
+            [$sut, '-assim-nao-pode'],
+            [$sut, 'assim-tambem-nao-'],
+            [$sut, 'nem--assim'],
+            [$sut, '--nem-assim'],
+            [$sut, 'Nem mesmo Assim'],
+            [$sut, 'Ou-ate-assim'],
+            [$sut, '-Se juntar-tudo-Então-'],
+            [$sut, 'eAssim-vai'],
+            [$sut, '@-!teste-teste'],
+            [$sut, '*teste-teste'],
+            [$sut, 123],
+            [$sut, []],
+            [$sut, 123.321],
+            [$sut, new stdClass()],
         ];
     }
 }

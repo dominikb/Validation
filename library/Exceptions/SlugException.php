@@ -9,10 +9,20 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class SlugException extends ValidationException
+/**
+ * @author Carlos André Ferrari <caferrari@gmail.com>
+ * @author Danilo Correa <danilosilva87@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class SlugException extends ValidationException
 {
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
             self::STANDARD => '{{name}} must be a valid slug',

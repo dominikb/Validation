@@ -9,16 +9,25 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class StartsWithException extends ValidationException
+/**
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class StartsWithException extends ValidationException
 {
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
-            self::STANDARD => '{{name}} must start with ({{startValue}})',
+            self::STANDARD => '{{name}} must start with {{startValue}}',
         ],
         self::MODE_NEGATIVE => [
-            self::STANDARD => '{{name}} must not start with ({{startValue}})',
+            self::STANDARD => '{{name}} must not start with {{startValue}}',
         ],
     ];
 }

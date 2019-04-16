@@ -9,98 +9,66 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Vowel
- * @covers Respect\Validation\Exceptions\VowelException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\AbstractFilterRule
+ * @covers \Respect\Validation\Rules\Vowel
+ *
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Kleber Hamada Sato <kleberhs007@yahoo.com>
+ * @author Nick Lombard <github@jigsoft.co.za>
+ * @author Pascal Borreli <pascal@borreli.com>
  */
-class VowelTest extends TestCase
+final class VowelTest extends RuleTestCase
 {
     /**
-     * @dataProvider providerForValidVowels
+     * {@inheritDoc}
      */
-    public function testValidDataWithVowelsShouldReturnTrue($validVowels, $additional = '')
+    public function providerForValidInput(): array
     {
-        $validator = new Vowel($additional);
-        $this->assertTrue($validator->validate($validVowels));
-    }
+        $sut = new Vowel();
 
-    /**
-     * @dataProvider providerForInvalidVowels
-     * @expectedException Respect\Validation\Exceptions\VowelException
-     */
-    public function testInvalidVowelsShouldFailAndThrowVowelException($invalidVowels, $additional = '')
-    {
-        $validator = new Vowel($additional);
-        $this->assertFalse($validator->validate($invalidVowels));
-        $this->assertFalse($validator->assert($invalidVowels));
-    }
-
-    /**
-     * @dataProvider providerForInvalidParams
-     * @expectedException Respect\Validation\Exceptions\ComponentException
-     */
-    public function testInvalidConstructorParamsShouldThrowComponentExceptionUponInstantiation($additional)
-    {
-        $validator = new Vowel($additional);
-    }
-
-    /**
-     * @dataProvider providerAdditionalChars
-     */
-    public function testAdditionalCharsShouldBeRespected($additional, $query)
-    {
-        $validator = new Vowel($additional);
-        $this->assertTrue($validator->validate($query));
-    }
-
-    public function providerAdditionalChars()
-    {
         return [
-            ['!@#$%^&*(){}', '!@#$%^&*(){} aeo iu'],
-            ['[]?+=/\\-_|"\',<>.', "[]?+=/\\-_|\"',<>. \t \n aeo iu"],
+            [$sut, 'a'],
+            [$sut, 'e'],
+            [$sut, 'i'],
+            [$sut, 'o'],
+            [$sut, 'u'],
+            [$sut, 'aeiou'],
+            [$sut, 'uoiea'],
+            [new Vowel('!@#$%^&*(){}'), '!@#$%^&*(){}aeoiu'],
+            [new Vowel('[]?+=/\\-_|"\',<>.'), '[]?+=/\\-_|"\',<>.aeoiu'],
         ];
     }
 
-    public function providerForInvalidParams()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
-        return [
-            [new \stdClass()],
-            [[]],
-            [0x2],
-        ];
-    }
+        $sut = new Vowel();
 
-    public function providerForValidVowels()
-    {
         return [
-            ['a'],
-            ['e'],
-            ['i'],
-            ['o'],
-            ['u'],
-            ['aeiou'],
-            ['aei ou'],
-            ["\na\t"],
-            ['uoiea'],
-        ];
-    }
-
-    public function providerForInvalidVowels()
-    {
-        return [
-            [''],
-            [null],
-            ['16'],
-            ['F'],
-            ['g'],
-            ['Foo'],
-            [-50],
-            ['basic'],
+            [$sut, ''],
+            [$sut, ' '],
+            [$sut, "\n"],
+            [$sut, "\t"],
+            [$sut, "\r"],
+            [$sut, null],
+            [$sut, '16'],
+            [$sut, 'F'],
+            [$sut, 'g'],
+            [$sut, 'Foo'],
+            [$sut, -50],
+            [$sut, 'basic'],
         ];
     }
 }

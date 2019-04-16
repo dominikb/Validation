@@ -1,5 +1,11 @@
+--CREDITS--
+Edson Lima <dddwebdeveloper@gmail.com>
+Henrique Moody <henriquemoody@gmail.com>
 --FILE--
 <?php
+
+declare(strict_types=1);
+
 require 'vendor/autoload.php';
 
 use Respect\Validation\Exceptions\AllOfException;
@@ -11,5 +17,5 @@ try {
     echo $e->getFullMessage();
 }
 ?>
---EXPECTF--
-- "Frank Zappa is fantastic" must not be string
+--EXPECT--
+- "Frank Zappa is fantastic" must not be of type string

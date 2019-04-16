@@ -9,94 +9,63 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-use Respect\Validation\Validator as v;
+use Respect\Validation\Test\RuleTestCase;
+use Respect\Validation\Test\Stubs\ToStringStub;
+use stdClass;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Domain
- * @covers Respect\Validation\Exceptions\DomainException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\Domain
+ *
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Mehmet Tolga Avcioglu <mehmet@activecom.net>
  */
-class DomainTest extends TestCase
+final class DomainTest extends RuleTestCase
 {
-    protected $object;
-
-    protected function setUp()
-    {
-        $this->object = new Domain();
-    }
-
     /**
-     * @dataProvider providerForDomain
+     * {@inheritDoc}
      */
-    public function testValidDomainsShouldReturnTrue($input, $tldcheck = true)
-    {
-        $this->object->tldCheck($tldcheck);
-        $this->assertTrue($this->object->__invoke($input));
-        $this->assertTrue($this->object->assert($input));
-        $this->assertTrue($this->object->check($input));
-    }
-
-    /**
-     * @dataProvider providerForNotDomain
-     * @expectedException Respect\Validation\Exceptions\ValidationException
-     */
-    public function testNotDomain($input, $tldcheck = true)
-    {
-        $this->object->tldCheck($tldcheck);
-        $this->assertFalse($this->object->check($input));
-    }
-
-    /**
-     * @dataProvider providerForNotDomain
-     * @expectedException Respect\Validation\Exceptions\DomainException
-     */
-    public function testNotDomainCheck($input, $tldcheck = true)
-    {
-        $this->object->tldCheck($tldcheck);
-        $this->assertFalse($this->object->assert($input));
-    }
-
-    public function providerForDomain()
+    public function providerForValidInput(): array
     {
         return [
-            ['111111111111domain.local', false],
-            ['111111111111.domain.local', false],
-            ['example.com'],
-            ['xn--bcher-kva.ch'],
-            ['mail.xn--bcher-kva.ch'],
-            ['example-hyphen.com'],
-            ['example--valid.com'],
-            ['std--a.com'],
-            ['r--w.com'],
-        ];
-    }
-
-    public function providerForNotDomain()
-    {
-        return [
-            [null],
-            [''],
-            ['2222222domain.local'],
-            ['-example-invalid.com'],
-            ['example.invalid.-com'],
-            ['xn--bcher--kva.ch'],
-            ['example.invalid-.com'],
-            ['1.2.3.256'],
-            ['1.2.3.4'],
+            [new Domain(false), '111111111111domain.local'],
+            [new Domain(false), '111111111111.domain.local'],
+            [new Domain(), 'example.com'],
+            [new Domain(), 'xn--bcher-kva.ch'],
+            [new Domain(), 'mail.xn--bcher-kva.ch'],
+            [new Domain(), 'example-hyphen.com'],
+            [new Domain(), 'example--valid.com'],
+            [new Domain(), 'std--a.com'],
+            [new Domain(), 'r--w.com'],
         ];
     }
 
     /**
-     * @dataProvider providerForDomain
+     * {@inheritDoc}
      */
-    public function testBuilder($validDomain, $checkTLD = true)
+    public function providerForInvalidInput(): array
     {
-        $this->assertTrue(
-            v::domain($checkTLD)->validate($validDomain),
-            sprintf('Domain "%s" should be valid. (Check TLD: %s)', $validDomain, var_export($checkTLD, true))
-        );
+        return [
+            [new Domain(), null],
+            [new Domain(), new stdClass()],
+            [new Domain(), []],
+            [new Domain(), new ToStringStub('google.com')],
+            [new Domain(), ''],
+            [new Domain(), 'no dots'],
+            [new Domain(), '2222222domain.local'],
+            [new Domain(), '-example-invalid.com'],
+            [new Domain(), 'example.invalid.-com'],
+            [new Domain(), 'xn--bcher--kva.ch'],
+            [new Domain(), 'example.invalid-.com'],
+            [new Domain(), '1.2.3.256'],
+            [new Domain(), '1.2.3.4'],
+        ];
     }
 }

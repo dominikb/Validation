@@ -9,95 +9,63 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
+use stdClass;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Cntrl
- * @covers Respect\Validation\Exceptions\CntrlException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\AbstractFilterRule
+ * @covers \Respect\Validation\Rules\Cntrl
+ *
+ * @author Andre Ramaciotti <andre@ramaciotti.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Nick Lombard <github@jigsoft.co.za>
+ * @author Pascal Borreli <pascal@borreli.com>
  */
-class CntrlTest extends TestCase
+final class CntrlTest extends RuleTestCase
 {
     /**
-     * @dataProvider providerForValidCntrl
+     * {@inheritDoc}
      */
-    public function testValidDataWithCntrlShouldReturnTrue($validCntrl, $additional = '')
+    public function providerForValidInput(): array
     {
-        $validator = new Cntrl($additional);
-        $this->assertTrue($validator->validate($validCntrl));
-    }
+        $cntrl = new Cntrl();
 
-    /**
-     * @dataProvider providerForInvalidCntrl
-     * @expectedException Respect\Validation\Exceptions\CntrlException
-     */
-    public function testInvalidCntrlShouldFailAndThrowCntrlException($invalidCntrl, $additional = '')
-    {
-        $validator = new Cntrl($additional);
-        $this->assertFalse($validator->validate($invalidCntrl));
-        $this->assertFalse($validator->assert($invalidCntrl));
-    }
-
-    /**
-     * @dataProvider providerForInvalidParams
-     * @expectedException Respect\Validation\Exceptions\ComponentException
-     */
-    public function testInvalidConstructorParamsShouldThrowComponentExceptionUponInstantiation($additional)
-    {
-        $validator = new Cntrl($additional);
-    }
-
-    /**
-     * @dataProvider providerAdditionalChars
-     */
-    public function testAdditionalCharsShouldBeRespected($additional, $query)
-    {
-        $validator = new Cntrl($additional);
-        $this->assertTrue($validator->validate($query));
-    }
-
-    public function providerAdditionalChars()
-    {
         return [
-            ['!@#$%^&*(){} ', '!@#$%^&*(){} '],
-            ['[]?+=/\\-_|"\',<>. ', "[]?+=/\\-_|\"',<>. \t \n"],
+            '\n' => [$cntrl, "\n"],
+            '\r' => [$cntrl, "\r"],
+            '\t' => [$cntrl, "\t"],
+            '\n\r\t' => [$cntrl, "\n\r\t"],
+            'Ignoring all characters' => [new Cntrl('!@#$%^&*(){} '), '!@#$%^&*(){} '],
+            'Ignoring some characters' => [new Cntrl('[]?+=/\\-_|"\',<>. '), "[]?+=/\\-_|\"',<>. \t \n"],
         ];
     }
 
-    public function providerForInvalidParams()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
-        return [
-            [new \stdClass()],
-            [[]],
-            [0x2],
-        ];
-    }
+        $cntrl = new Cntrl();
 
-    public function providerForValidCntrl()
-    {
         return [
-            ["\n"],
-            ["\r"],
-            ["\t"],
-            ["\n\r\t"],
-//            array("\n \n", ' '), TODO Verify this
-        ];
-    }
-
-    public function providerForInvalidCntrl()
-    {
-        return [
-            [''],
-            ['16-50'],
-            ['a'],
-            [' '],
-            ['Foo'],
-            ['12.1'],
-            ['-12'],
-            [-12],
-            ['alganet'],
+            'empty parameter' => [$cntrl, ''],
+            '16-50' => [$cntrl, '16-50'],
+            'a' => [$cntrl, 'a'],
+            'white space' => [$cntrl, ' '],
+            'Foo' => [$cntrl, 'Foo'],
+            '12.1' => [$cntrl, '12.1'],
+            '"-12"' => [$cntrl, '-12'],
+            '-12' => [$cntrl, -12],
+            'alganet' => [$cntrl, 'alganet'],
+            'empty array parameter' => [$cntrl, []],
+            'object' => [$cntrl, new stdClass()],
         ];
     }
 }

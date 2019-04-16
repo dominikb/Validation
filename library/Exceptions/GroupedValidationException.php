@@ -9,13 +9,24 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
+use function count;
+
+/**
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
 class GroupedValidationException extends NestedValidationException
 {
-    const NONE = 0;
-    const SOME = 1;
+    public const NONE = 'none';
+    public const SOME = 'some';
 
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
             self::NONE => 'All of the required rules must pass for {{name}}',
@@ -27,11 +38,14 @@ class GroupedValidationException extends NestedValidationException
         ],
     ];
 
-    public function chooseTemplate()
+    /**
+     * {@inheritDoc}
+     */
+    protected function chooseTemplate(): string
     {
         $numRules = $this->getParam('passed');
-        $numFailed = $this->getRelated()->count();
+        $numFailed = count($this->getChildren());
 
-        return $numRules === $numFailed ? static::NONE : static::SOME;
+        return $numRules === $numFailed ? self::NONE : self::SOME;
     }
 }

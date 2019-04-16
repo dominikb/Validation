@@ -9,50 +9,73 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\TestCase;
+use Respect\Validation\Validatable;
 use Respect\Validation\Validator;
 
 /**
  * @group  rule
- * @covers Respect\Validation\Rules\Not
- * @covers Respect\Validation\Exceptions\NotException
+ * @covers \Respect\Validation\Exceptions\NotException
+ * @covers \Respect\Validation\Rules\Not
+ *
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Caio César Tavares <caiotava@gmail.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class NotTest extends TestCase
+final class NotTest extends TestCase
 {
     /**
+     * @doesNotPerformAssertions
+     *
      * @dataProvider providerForValidNot
+     *
+     * @test
+     *
+     * @param mixed $input
      */
-    public function testNot($v, $input)
+    public function not(Validatable $rule, $input): void
     {
-        $not = new Not($v);
-        $this->assertTrue($not->assert($input));
+        $not = new Not($rule);
+        $not->assert($input);
     }
 
     /**
      * @dataProvider providerForInvalidNot
-     * @expectedException Respect\Validation\Exceptions\ValidationException
+     * @expectedException \Respect\Validation\Exceptions\ValidationException
+     *
+     * @test
+     *
+     * @param mixed $input
      */
-    public function testNotNotHaha($v, $input)
+    public function notNotHaha(Validatable $rule, $input): void
     {
-        $not = new Not($v);
-        $this->assertFalse($not->assert($input));
+        $not = new Not($rule);
+        $not->assert($input);
     }
 
     /**
      * @dataProvider providerForSetName
+     *
+     * @test
      */
-    public function testNotSetName($v)
+    public function notSetName(Validatable $rule): void
     {
-        $not = new Not($v);
+        $not = new Not($rule);
         $not->setName('Foo');
 
-        $this->assertEquals('Foo', $not->getName());
-        $this->assertEquals('Foo', $v->getName());
+        self::assertEquals('Foo', $not->getName());
+        self::assertEquals('Foo', $not->getNegatedRule()->getName());
     }
 
-    public function providerForValidNot()
+    /**
+     * @return mixed[][]
+     */
+    public function providerForValidNot(): array
     {
         return [
             [new IntVal(), ''],
@@ -60,30 +83,36 @@ class NotTest extends TestCase
             [new AllOf(new NoWhitespace(), new Digit()), 'as df'],
             [new AllOf(new NoWhitespace(), new Digit()), '12 34'],
             [new AllOf(new AllOf(new NoWhitespace(), new Digit())), '12 34'],
-            [new AllOf(new NoneOf(new Numeric(), new IntVal())), 13.37],
-            [new NoneOf(new Numeric(), new IntVal()), 13.37],
-            [Validator::noneOf(Validator::numeric(), Validator::intVal()), 13.37],
+            [new AllOf(new NoneOf(new NumericVal(), new IntVal())), 13.37],
+            [new NoneOf(new NumericVal(), new IntVal()), 13.37],
+            [Validator::noneOf(Validator::numericVal(), Validator::intVal()), 13.37],
         ];
     }
 
-    public function providerForInvalidNot()
+    /**
+     * @return mixed[][]
+     */
+    public function providerForInvalidNot(): array
     {
         return [
             [new IntVal(), 123],
-            [new AllOf(new OneOf(new Numeric(), new IntVal())), 13.37],
-            [new OneOf(new Numeric(), new IntVal()), 13.37],
-            [Validator::oneOf(Validator::numeric(), Validator::intVal()), 13.37],
+            [new AllOf(new AnyOf(new NumericVal(), new IntVal())), 13.37],
+            [new AnyOf(new NumericVal(), new IntVal()), 13.37],
+            [Validator::anyOf(Validator::numericVal(), Validator::intVal()), 13.37],
         ];
     }
 
-    public function providerForSetName()
+    /**
+     * @return Validatable[][]
+     */
+    public function providerForSetName(): array
     {
         return [
-            [new IntVal()],
-            [new AllOf(new Numeric, new IntVal)],
-            [new Not(new Not(new IntVal()))],
-            [Validator::intVal()->setName('Bar')],
-            [Validator::noneOf(Validator::numeric(), Validator::intVal())],
+            'non-allOf' => [new IntVal()],
+            'allOf' => [new AllOf(new NumericVal(), new IntVal())],
+            'not' => [new Not(new Not(new IntVal()))],
+            'allOf with name' => [Validator::intVal()->setName('Bar')],
+            'noneOf' => [Validator::noneOf(Validator::numericVal(), Validator::intVal())],
         ];
     }
 }

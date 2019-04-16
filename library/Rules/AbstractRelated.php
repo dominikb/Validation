@@ -9,26 +9,61 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Exceptions\ValidationException;
 use Respect\Validation\Validatable;
+use function is_null;
+use function is_scalar;
 
+/**
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Emmerson Siqueira <emmersonsiqueira@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Nick Lombard <github@jigsoft.co.za>
+ */
 abstract class AbstractRelated extends AbstractRule
 {
+    /**
+     * @var bool
+     */
     public $mandatory = true;
+
+    /**
+     * @var mixed
+     */
     public $reference = '';
+
+    /**
+     * @var Validatable|null
+     */
     public $validator;
 
-    abstract public function hasReference($input);
+    /**
+     * @param mixed $input
+     */
+    abstract public function hasReference($input): bool;
 
+    /**
+     * @param mixed $input
+     *
+     * @return mixed
+     */
     abstract public function getReferenceValue($input);
 
-    public function __construct($reference, Validatable $validator = null, $mandatory = true)
+    /**
+     * @param mixed $reference
+     */
+    public function __construct($reference, ?Validatable $validator = null, bool $mandatory = true)
     {
-        $this->setName($reference);
-        if ($validator && !$validator->getName()) {
-            $validator->setName($reference);
+        if (is_scalar($reference)) {
+            $this->setName((string) $reference);
+            if ($validator && !$validator->getName()) {
+                $validator->setName((string) $reference);
+            }
         }
 
         $this->reference = $reference;
@@ -36,7 +71,10 @@ abstract class AbstractRelated extends AbstractRule
         $this->mandatory = $mandatory;
     }
 
-    public function setName($name)
+    /**
+     * {@inheritDoc}
+     */
+    public function setName(string $name): Validatable
     {
         parent::setName($name);
 
@@ -47,14 +85,10 @@ abstract class AbstractRelated extends AbstractRule
         return $this;
     }
 
-    private function decision($type, $hasReference, $input)
-    {
-        return (!$this->mandatory && !$hasReference)
-            || (is_null($this->validator)
-                || $this->validator->$type($this->getReferenceValue($input)));
-    }
-
-    public function assert($input)
+    /**
+     * {@inheritDoc}
+     */
+    public function assert($input): void
     {
         $hasReference = $this->hasReference($input);
         if ($this->mandatory && !$hasReference) {
@@ -62,25 +96,33 @@ abstract class AbstractRelated extends AbstractRule
         }
 
         try {
-            return $this->decision('assert', $hasReference, $input);
-        } catch (ValidationException $e) {
-            throw $this
-                ->reportError($this->reference, ['hasReference' => true])
-                ->addRelated($e);
+            $this->decision('assert', $hasReference, $input);
+        } catch (ValidationException $validationException) {
+            /** @var NestedValidationException $nestedValidationException */
+            $nestedValidationException = $this->reportError($this->reference, ['hasReference' => true]);
+            $nestedValidationException->addChild($validationException);
+
+            throw $nestedValidationException;
         }
     }
 
-    public function check($input)
+    /**
+     * {@inheritDoc}
+     */
+    public function check($input): void
     {
         $hasReference = $this->hasReference($input);
         if ($this->mandatory && !$hasReference) {
             throw $this->reportError($input, ['hasReference' => false]);
         }
 
-        return $this->decision('check', $hasReference, $input);
+        $this->decision('check', $hasReference, $input);
     }
 
-    public function validate($input)
+    /**
+     * {@inheritDoc}
+     */
+    public function validate($input): bool
     {
         $hasReference = $this->hasReference($input);
         if ($this->mandatory && !$hasReference) {
@@ -88,5 +130,15 @@ abstract class AbstractRelated extends AbstractRule
         }
 
         return $this->decision('validate', $hasReference, $input);
+    }
+
+    /**
+     * @param mixed $input
+     */
+    private function decision(string $type, bool $hasReference, $input): bool
+    {
+        return (!$this->mandatory && !$hasReference)
+            || (is_null($this->validator)
+                || $this->validator->$type($this->getReferenceValue($input)));
     }
 }

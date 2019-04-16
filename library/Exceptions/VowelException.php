@@ -9,18 +9,27 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class VowelException extends AlphaException
+/**
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Kleber Hamada Sato <kleberhs007@yahoo.com>
+ */
+final class VowelException extends FilteredValidationException
 {
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
             self::STANDARD => '{{name}} must contain only vowels',
-            self::EXTRA => '{{name}} must contain only vowels and "{{additionalChars}}"',
+            self::EXTRA => '{{name}} must contain only vowels and {{additionalChars}}',
         ],
         self::MODE_NEGATIVE => [
             self::STANDARD => '{{name}} must not contain vowels',
-            self::EXTRA => '{{name}} must not contain vowels or "{{additionalChars}}"',
+            self::EXTRA => '{{name}} must not contain vowels or {{additionalChars}}',
         ],
     ];
 }

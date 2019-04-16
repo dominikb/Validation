@@ -9,15 +9,28 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
+
+use ArrayIterator;
+use ArrayObject;
+use Respect\Validation\Test\RuleTestCase;
 
 /**
  * @group  rule
- * @covers Respect\Validation\Rules\ArrayType
+ * @covers \Respect\Validation\Rules\ArrayType
+ *
+ * @author Emmerson Siqueira <emmersonsiqueira@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author João Torquato <joao.otl@gmail.com>
  */
-class ArrayTypeTest extends RuleTestCase
+final class ArrayTypeTest extends RuleTestCase
 {
-    public function providerForValidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForValidInput(): array
     {
         $rule = new ArrayType();
 
@@ -27,7 +40,10 @@ class ArrayTypeTest extends RuleTestCase
         ];
     }
 
-    public function providerForInvalidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
         $rule = new ArrayType();
 
@@ -36,8 +52,8 @@ class ArrayTypeTest extends RuleTestCase
             [$rule, 1],
             [$rule, 1.0],
             [$rule, true],
-            [$rule, new \ArrayObject()],
-            [$rule, new \ArrayIterator()],
+            [$rule, new ArrayObject()],
+            [$rule, new ArrayIterator()],
         ];
     }
 }

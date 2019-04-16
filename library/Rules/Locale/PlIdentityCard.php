@@ -9,18 +9,32 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules\Locale;
 
 use Respect\Validation\Rules\AbstractRule;
+use function ord;
+use function preg_match;
 
 /**
  * Validator for Polish identity card.
  *
- * @link https://en.wikipedia.org/wiki/Polish_identity_card
+ * @see https://en.wikipedia.org/wiki/Polish_identity_card
+ *
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class PlIdentityCard extends AbstractRule
+final class PlIdentityCard extends AbstractRule
 {
-    public function validate($input)
+    private const ASCII_CODE_0 = 48;
+    private const ASCII_CODE_7 = 55;
+    private const ASCII_CODE_9 = 57;
+    private const ASCII_CODE_A = 65;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function validate($input): bool
     {
         if (!preg_match('/^[A-Z0-9]{9}$/', $input)) {
             return false;
@@ -30,15 +44,15 @@ class PlIdentityCard extends AbstractRule
         $weightedSum = 0;
         for ($i = 0; $i < 9; ++$i) {
             $code = ord($input[$i]);
-            if ($i < 3 && $code <= 57) { // 57 is "9"
+            if ($i < 3 && $code <= self::ASCII_CODE_9) {
                 return false;
             }
 
-            if ($i > 2 && $code >= 65) { // 65 is "A"
+            if ($i > 2 && $code >= self::ASCII_CODE_A) {
                 return false;
             }
 
-            $difference = $code <= 57 ? 48 : 55; // 48 is "0"
+            $difference = $code <= self::ASCII_CODE_9 ? self::ASCII_CODE_0 : self::ASCII_CODE_7;
             $weightedSum += ($code - $difference) * $weights[$i];
         }
 

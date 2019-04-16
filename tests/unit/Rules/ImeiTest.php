@@ -9,15 +9,28 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
+use Respect\Validation\Test\RuleTestCase;
+use stdClass;
+
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Imei
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\Imei
+ *
+ * @author Danilo Benevides <danilobenevides01@gmail.com>
+ * @author Diego Oliveira <contato@diegoholiveira.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class ImeiTest extends RuleTestCase
+final class ImeiTest extends RuleTestCase
 {
-    public function providerForValidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForValidInput(): array
     {
         $rule = new Imei();
 
@@ -33,7 +46,10 @@ class ImeiTest extends RuleTestCase
         ];
     }
 
-    public function providerForInvalidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
         $rule = new Imei();
 
@@ -41,7 +57,7 @@ class ImeiTest extends RuleTestCase
             [$rule, ''],
             [$rule, null],
             [$rule, 1.0],
-            [$rule, new \stdClass()],
+            [$rule, new stdClass()],
             [$rule, '490154203237512'],
             [$rule, '4901542032375125'],
             [$rule, 'Whateveeeeeerrr'],

@@ -9,83 +9,125 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
+use function setlocale;
+use const LC_ALL;
 
 /**
  * @group  rule
- * @covers Respect\Validation\Rules\No
- * @covers Respect\Validation\Exceptions\NoException
+ * @covers \Respect\Validation\Exceptions\NoException
+ * @covers \Respect\Validation\Rules\No
+ *
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class NoTest extends TestCase
+final class NoTest extends RuleTestCase
 {
-    public function testShouldUseDefaultPattern()
+    /**
+     * @var string
+     */
+    private $locale;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function setUp(): void
     {
-        $rule = new No();
-
-        $actualPattern = $rule->regex;
-        $expectedPattern = '/^n(o(t|pe)?|ix|ay)?$/i';
-
-        $this->assertEquals($expectedPattern, $actualPattern);
-    }
-
-    public function testShouldUseLocalPatternForNoExpressionWhenDefined()
-    {
-        if (!defined('NOEXPR')) {
-            $this->markTestSkipped('Constant NOEXPR is not defined');
-
-            return;
-        }
-
-        $rule = new No(true);
-
-        $actualPattern = $rule->regex;
-        $expectedPattern = '/'.nl_langinfo(NOEXPR).'/i';
-
-        $this->assertEquals($expectedPattern, $actualPattern);
+        $this->locale = setlocale(LC_ALL, 0);
     }
 
     /**
-     * @dataProvider validNoProvider
+     * {@inheritDoc}
      */
-    public function testShouldValidatePatternAccordingToTheDefinedLocale($input)
+    protected function tearDown(): void
     {
-        $rule = new No();
-
-        $this->assertTrue($rule->validate($input));
+        setlocale(LC_ALL, $this->locale);
     }
 
-    public function validNoProvider()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForValidInput(): array
     {
+        $sut = new No();
+
         return [
-            ['N'],
-            ['Nay'],
-            ['Nix'],
-            ['No'],
-            ['Nope'],
-            ['Not'],
+            [$sut, 'N'],
+            [$sut, 'Nay'],
+            [$sut, 'Nix'],
+            [$sut, 'No'],
+            [$sut, 'Nope'],
+            [$sut, 'Not'],
         ];
     }
 
     /**
-     * @dataProvider invalidNoProvider
+     * {@inheritDoc}
      */
-    public function testShouldNotValidatePatternAccordingToTheDefinedLocale($input)
+    public function providerForInvalidInput(): array
     {
-        $rule = new No();
+        $sut = new No();
 
-        $this->assertFalse($rule->validate($input));
+        return [
+            [$sut, 'Donnot'],
+            [$sut, 'Never'],
+            [$sut, 'Niet'],
+            [$sut, 'Noooooooo'],
+            [$sut, 'Não'],
+        ];
     }
 
-    public function invalidNoProvider()
+    /**
+     * @return string[][]
+     */
+    public function providerForValidInputWithLocale(): array
     {
         return [
-            ['Donnot'],
-            ['Never'],
-            ['Niet'],
-            ['Noooooooo'],
-            ['Não'],
+            'nl' => ['nl_NL.UTF-8', 'Nee'],
+            'pt' => ['pt_BR.UTF-8', 'Não'],
+            'ru' => ['ru_RU.UTF-8', 'нет'],
         ];
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function providerForInvalidInputWithLocale(): array
+    {
+        return [
+            'nl' => ['nl_NL.UTF-8', 'Ez'],
+            'pt' => ['pt_BR.UTF-8', 'нет'],
+            'ru' => ['pt_BR.UTF-8', 'Οχι'],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider providerForValidInputWithLocale
+     */
+    public function itShouldValidateInputAccordingToTheLocale(string $locale, string $input): void
+    {
+        setlocale(LC_ALL, $locale);
+
+        self::assertEquals($locale, setlocale(LC_ALL, 0));
+        self::assertValidInput(new No(true), $input);
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider providerForInvalidInputWithLocale
+     */
+    public function itShouldInvalidateInputAccordingToTheLocale(string $locale, string $input): void
+    {
+        setlocale(LC_ALL, $locale);
+
+        self::assertEquals($locale, setlocale(LC_ALL, 0));
+        self::assertInvalidInput(new No(true), $input);
     }
 }

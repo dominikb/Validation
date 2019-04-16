@@ -9,26 +9,52 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
 use Respect\Validation\Exceptions\ComponentException;
 use Respect\Validation\Exceptions\ValidationException;
+use Respect\Validation\Validatable;
 use Respect\Validation\Validator;
+use function array_keys;
+use function in_array;
 
-class KeyValue extends AbstractRule
+/**
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class KeyValue extends AbstractRule
 {
-    public $comparedKey;
-    public $ruleName;
-    public $baseKey;
+    /**
+     * @var int|string
+     */
+    private $comparedKey;
 
-    public function __construct($comparedKey, $ruleName, $baseKey)
+    /**
+     * @var string
+     */
+    private $ruleName;
+
+    /**
+     * @var int|string
+     */
+    private $baseKey;
+
+    /**
+     * @param int|string $comparedKey
+     * @param int|string $baseKey
+     */
+    public function __construct($comparedKey, string $ruleName, $baseKey)
     {
         $this->comparedKey = $comparedKey;
         $this->ruleName = $ruleName;
         $this->baseKey = $baseKey;
     }
 
-    private function getRule($input)
+    /**
+     * @param mixed $input
+     */
+    private function getRule($input): Validatable
     {
         if (!isset($input[$this->comparedKey])) {
             throw $this->reportError($this->comparedKey);
@@ -48,23 +74,27 @@ class KeyValue extends AbstractRule
         return $rule;
     }
 
-    private function overwriteExceptionParams(ValidationException $exception)
+    private function overwriteExceptionParams(ValidationException $exception): ValidationException
     {
         $params = [];
-        foreach ($exception->getParams() as $key => $value) {
+        foreach (array_keys($exception->getParams()) as $key) {
             if (in_array($key, ['template', 'translator'])) {
                 continue;
             }
 
             $params[$key] = $this->baseKey;
         }
+        $params['name'] = $this->comparedKey;
 
-        $exception->configure($this->comparedKey, $params);
+        $exception->updateParams($params);
 
         return $exception;
     }
 
-    public function assert($input)
+    /**
+     * {@inheritDoc}
+     */
+    public function assert($input): void
     {
         $rule = $this->getRule($input);
 
@@ -73,11 +103,12 @@ class KeyValue extends AbstractRule
         } catch (ValidationException $exception) {
             throw $this->overwriteExceptionParams($exception);
         }
-
-        return true;
     }
 
-    public function check($input)
+    /**
+     * {@inheritDoc}
+     */
+    public function check($input): void
     {
         $rule = $this->getRule($input);
 
@@ -86,11 +117,12 @@ class KeyValue extends AbstractRule
         } catch (ValidationException $exception) {
             throw $this->overwriteExceptionParams($exception);
         }
-
-        return true;
     }
 
-    public function validate($input)
+    /**
+     * {@inheritDoc}
+     */
+    public function validate($input): bool
     {
         try {
             $rule = $this->getRule($input);

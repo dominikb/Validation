@@ -9,14 +9,19 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions\Locale;
 
 use Respect\Validation\Exceptions\ValidationException;
 
-class PlIdentityCardException extends ValidationException
+/**
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class PlIdentityCardException extends ValidationException
 {
     /**
-     * @var array
+     * {@inheritDoc}
      */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [

@@ -9,14 +9,35 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
 use ArrayAccess;
 use Respect\Validation\Exceptions\ComponentException;
+use function array_key_exists;
+use function array_shift;
+use function explode;
+use function is_array;
+use function is_null;
+use function is_object;
+use function is_scalar;
+use function property_exists;
+use function rtrim;
+use function sprintf;
 
-class KeyNested extends AbstractRelated
+/**
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Emmerson Siqueira <emmersonsiqueira@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Ivan Zinovyev <vanyazin@gmail.com>
+ */
+final class KeyNested extends AbstractRelated
 {
-    public function hasReference($input)
+    /**
+     * {@inheritDoc}
+     */
+    public function hasReference($input): bool
     {
         try {
             $this->getReferenceValue($input);
@@ -27,12 +48,21 @@ class KeyNested extends AbstractRelated
         return true;
     }
 
-    private function getReferencePieces()
+    /**
+     * @return string[]
+     */
+    private function getReferencePieces(): array
     {
-        return explode('.', rtrim($this->reference, '.'));
+        return explode('.', rtrim((string) $this->reference, '.'));
     }
 
-    private function getValueFromArray($array, $key)
+    /**
+     * @param mixed[] $array
+     * @param mixed $key
+     *
+     * @return mixed
+     */
+    private function getValueFromArray(array $array, $key)
     {
         if (!array_key_exists($key, $array)) {
             $message = sprintf('Cannot select the key %s from the given array', $this->reference);
@@ -42,7 +72,29 @@ class KeyNested extends AbstractRelated
         return $array[$key];
     }
 
-    private function getValueFromObject($object, $property)
+    /**
+     * @param mixed $key
+     *
+     * @return mixed
+     */
+    private function getValueFromArrayAccess(ArrayAccess $array, $key)
+    {
+        if (!$array->offsetExists($key)) {
+            $message = sprintf('Cannot select the key %s from the given array', $this->reference);
+            throw new ComponentException($message);
+        }
+
+        return $array->offsetGet($key);
+    }
+
+    /**
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+     *
+     * @param object $object
+     *
+     * @return mixed
+     */
+    private function getValueFromObject($object, string $property)
     {
         if (empty($property) || !property_exists($object, $property)) {
             $message = sprintf('Cannot select the property %s from the given object', $this->reference);
@@ -52,10 +104,20 @@ class KeyNested extends AbstractRelated
         return $object->{$property};
     }
 
+    /**
+     * @param mixed $value
+     * @param mixed $key
+     *
+     * @return mixed
+     */
     private function getValue($value, $key)
     {
-        if (is_array($value) || $value instanceof ArrayAccess) {
+        if (is_array($value)) {
             return $this->getValueFromArray($value, $key);
+        }
+
+        if ($value instanceof ArrayAccess) {
+            return $this->getValueFromArrayAccess($value, $key);
         }
 
         if (is_object($value)) {
@@ -66,6 +128,9 @@ class KeyNested extends AbstractRelated
         throw new ComponentException($message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReferenceValue($input)
     {
         if (is_scalar($input)) {

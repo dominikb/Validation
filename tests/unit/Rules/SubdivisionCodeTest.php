@@ -9,42 +9,47 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\TestCase;
 
 /**
- * @covers Respect\Validation\Rules\SubdivisionCode
- * @covers Respect\Validation\Exceptions\SubdivisionCodeException
+ * @covers \Respect\Validation\Exceptions\SubdivisionCodeException
+ * @covers \Respect\Validation\Rules\SubdivisionCode
+ *
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class SubdivisionCodeTest extends TestCase
+final class SubdivisionCodeTest extends TestCase
 {
     /**
-     * @expectedException Respect\Validation\Exceptions\ComponentException
-     * @expectedExceptionMessage "whatever" is not a valid country code in ISO 3166-2
+     * @expectedException \Respect\Validation\Exceptions\ComponentException
+     * @expectedExceptionMessage "whatever" is not a supported country code
+     *
+     * @test
      */
-    public function testShouldThrowsExceptionWhenInvalidFormat()
+    public function shouldThrowsExceptionWhenInvalidFormat(): void
     {
         new SubdivisionCode('whatever');
     }
 
     /**
-     * @expectedException Respect\Validation\Exceptions\ComponentException
-     * @expectedExceptionMessage "JK" is not a valid country code in ISO 3166-2
+     * @expectedException \Respect\Validation\Exceptions\ComponentException
+     * @expectedExceptionMessage "JK" is not a supported country code
+     *
+     * @test
      */
-    public function testShouldNotAcceptWrongNamesOnConstructor()
+    public function shouldNotAcceptWrongNamesOnConstructor(): void
     {
         new SubdivisionCode('JK');
     }
 
-    public function testShouldDefineASubdivisionCodeFormatOnConstructor()
-    {
-        $countrySubdivision = new SubdivisionCode('US');
-
-        $this->assertEquals('US', $countrySubdivision->countryCode);
-    }
-
-    public function providerForValidSubdivisionCodeInformation()
+    /**
+     * @return mixed[][]
+     */
+    public function providerForValidSubdivisionCodeInformation(): array
     {
         return [
             ['AQ',  null],
@@ -57,15 +62,20 @@ class SubdivisionCodeTest extends TestCase
 
     /**
      * @dataProvider providerForValidSubdivisionCodeInformation
+     *
+     * @test
      */
-    public function testShouldValidateValidSubdivisionCodeInformation($countryCode, $input)
+    public function shouldValidateValidSubdivisionCodeInformation(string $countryCode, ?string $input): void
     {
         $countrySubdivision = new SubdivisionCode($countryCode);
 
-        $this->assertTrue($countrySubdivision->validate($input));
+        self::assertTrue($countrySubdivision->validate($input));
     }
 
-    public function providerForInvalidSubdivisionCodeInformation()
+    /**
+     * @return mixed[][]
+     */
+    public function providerForInvalidSubdivisionCodeInformation(): array
     {
         return [
             ['BR',  'CA'],
@@ -76,19 +86,25 @@ class SubdivisionCodeTest extends TestCase
 
     /**
      * @dataProvider providerForInvalidSubdivisionCodeInformation
+     *
+     * @test
+     *
+     * @param mixed $input
      */
-    public function testShouldNotValidateInvalidSubdivisionCodeInformation($countryCode, $input)
+    public function shouldNotValidateInvalidSubdivisionCodeInformation(string $countryCode, $input): void
     {
         $countrySubdivision = new SubdivisionCode($countryCode);
 
-        $this->assertFalse($countrySubdivision->validate($input));
+        self::assertFalse($countrySubdivision->validate($input));
     }
 
     /**
-     * @expectedException Respect\Validation\Exceptions\SubdivisionCode\BrSubdivisionCodeException
-     * @expectedExceptionMessage "CA" must be a subdivision code of Brazil
+     * @expectedException \Respect\Validation\Exceptions\SubdivisionCodeException
+     * @expectedExceptionMessage "CA" must be a subdivision code of "Brazil"
+     *
+     * @test
      */
-    public function testShouldThrowsSubdivisionCodeException()
+    public function shouldThrowsSubdivisionCodeException(): void
     {
         $countrySubdivision = new SubdivisionCode('BR');
         $countrySubdivision->assert('CA');

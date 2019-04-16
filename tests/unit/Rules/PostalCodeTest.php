@@ -9,136 +9,97 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\PostalCode
- * @covers Respect\Validation\Exceptions\PostalCodeException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\PostalCode
+ *
+ * @author Axel Wargnier <axel@axessweb.fr>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Sebastian <me@sebastianpontow.de>
  */
-class PostalCodeTest extends TestCase
+final class PostalCodeTest extends RuleTestCase
 {
-    public function testShouldUsePatternAccordingToCountryCode()
-    {
-        $countryCode = 'BR';
-
-        $rule = new PostalCode($countryCode);
-
-        $actualPattern = $rule->regex;
-        $expectedPattern = $rule->postalCodes[$countryCode];
-
-        $this->assertEquals($expectedPattern, $actualPattern);
-    }
-
-    public function testShouldNotBeCaseSensitiveWhenChoosingPatternAccordingToCountryCode()
-    {
-        $rule1 = new PostalCode('BR');
-        $rule2 = new PostalCode('br');
-
-        $this->assertEquals($rule1->regex, $rule2->regex);
-    }
-
-    public function testShouldUseDefaultPatternWhenCountryCodeDoesNotHavePostalCode()
+    /**
+     * @test
+     */
+    public function shouldValidateEmptyStringsWhenUsingDefaultPattern(): void
     {
         $rule = new PostalCode('ZW');
 
-        $actualPattern = $rule->regex;
-        $expectedPattern = PostalCode::DEFAULT_PATTERN;
-
-        $this->assertEquals($expectedPattern, $actualPattern);
-    }
-
-    public function testShouldValidateEmptyStringsWhenUsingDefaultPattern()
-    {
-        $rule = new PostalCode('ZW');
-
-        $this->assertTrue($rule->validate(''));
-    }
-
-    public function testShouldNotValidateNonEmptyStringsWhenUsingDefaultPattern()
-    {
-        $rule = new PostalCode('ZW');
-
-        $this->assertFalse($rule->validate(' '));
+        self::assertValidInput($rule, '');
     }
 
     /**
-     * @expectedException Respect\Validation\Exceptions\ComponentException
-     * @expectedExceptionMessage Cannot validate postal code from "Whatever" country
+     * @test
      */
-    public function testShouldThrowsExceptionWhenCountryCodeIsNotValid()
+    public function shouldNotValidateNonEmptyStringsWhenUsingDefaultPattern(): void
+    {
+        $rule = new PostalCode('ZW');
+
+        self::assertInvalidInput($rule, ' ');
+    }
+
+    /**
+     * @expectedException \Respect\Validation\Exceptions\ComponentException
+     * @expectedExceptionMessage Cannot validate postal code from "Whatever" country
+     *
+     * @test
+     */
+    public function shouldThrowsExceptionWhenCountryCodeIsNotValid(): void
     {
         new PostalCode('Whatever');
     }
 
     /**
-     * @dataProvider validPostalCodesProvider
+     * {@inheritDoc}
      */
-    public function testShouldValidatePatternAccordingToTheDefinedCountryCode($countryCode, $postalCode)
-    {
-        $rule = new PostalCode($countryCode);
-
-        $this->assertTrue($rule->validate($postalCode));
-    }
-
-    public function validPostalCodesProvider()
+    public function providerForValidInput(): array
     {
         return [
-            ['BR', '02179-000'],
-            ['BR', '02179000'],
-            ['CA', 'A1A 2B2'],
-            ['GB', 'GIR 0AA'],
-            ['GB', 'PR1 9LY'],
-            ['US', '02179'],
-            ['YE', ''],
-            ['PL', '99-300'],
-            ['NL', '1012 GX'],
-            ['NL', '1012GX'],
-            ['PT', '3660-606'],
-            ['PT', '3660606'],
-            ['CO', '110231'],
-            ['KR', '03187'],
-            ['IE', 'D14 YD91'],
-            ['IE', 'D6W 3333'],
+            [new PostalCode('BR'), '02179-000'],
+            [new PostalCode('BR'), '02179000'],
+            [new PostalCode('CA'), 'A1A 2B2'],
+            [new PostalCode('GB'), 'GIR 0AA'],
+            [new PostalCode('GB'), 'PR1 9LY'],
+            [new PostalCode('US'), '02179'],
+            [new PostalCode('YE'), ''],
+            [new PostalCode('PL'), '99-300'],
+            [new PostalCode('NL'), '1012 GX'],
+            [new PostalCode('NL'), '1012GX'],
+            [new PostalCode('PT'), '3660-606'],
+            [new PostalCode('PT'), '3660606'],
+            [new PostalCode('CO'), '110231'],
+            [new PostalCode('KR'), '03187'],
+            [new PostalCode('IE'), 'D14 YD91'],
+            [new PostalCode('IE'), 'D6W 3333'],
         ];
     }
 
     /**
-     * @dataProvider invalidPostalCodesProvider
+     * {@inheritDoc}
      */
-    public function testShouldNotValidatePatternAccordingToTheDefinedCountryCode($countryCode, $postalCode)
-    {
-        $rule = new PostalCode($countryCode);
-
-        $this->assertFalse($rule->validate($postalCode));
-    }
-
-    /**
-     * @expectedException Respect\Validation\Exceptions\PostalCodeException
-     * @expectedExceptionMessage "02179-000" must be a valid postal code on "US"
-     */
-    public function testShouldThrowsPostalCodeExceptionWhenValidationFails()
-    {
-        $rule = new PostalCode('US');
-        $rule->check('02179-000');
-    }
-
-    public function invalidPostalCodesProvider()
+    public function providerForInvalidInput(): array
     {
         return [
-            ['BR', '02179'],
-            ['BR', '02179.000'],
-            ['CA', '1A1B2B'],
-            ['GB', 'GIR 00A'],
-            ['GB', 'GIR0AA'],
-            ['GB', 'PR19LY'],
-            ['US', '021 79'],
-            ['YE', '02179'],
-            ['PL', '99300'],
-            ['KR', '548940'],
-            ['KR', '548-940'],
+            [new PostalCode('BR'), '02179'],
+            [new PostalCode('BR'), '02179.000'],
+            [new PostalCode('CA'), '1A1B2B'],
+            [new PostalCode('GB'), 'GIR 00A'],
+            [new PostalCode('GB'), 'GIR0AA'],
+            [new PostalCode('GB'), 'PR19LY'],
+            [new PostalCode('US'), '021 79'],
+            [new PostalCode('YE'), '02179'],
+            [new PostalCode('PL'), '99300'],
+            [new PostalCode('KR'), '548940'],
+            [new PostalCode('KR'), '548-940'],
         ];
     }
 }

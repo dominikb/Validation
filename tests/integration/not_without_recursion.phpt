@@ -1,7 +1,12 @@
+--CREDITS--
+Henrique Moody <henriquemoody@gmail.com>
 --TEST--
-not() with recursion should update mode from related rules
+not() with recursion should update mode of its children
 --FILE--
 <?php
+
+declare(strict_types=1);
+
 require 'vendor/autoload.php';
 
 use Respect\Validation\Exceptions\ValidationException;
@@ -13,8 +18,8 @@ try {
     );
     $validator->check(2);
 } catch (ValidationException $exception) {
-    echo $exception->getMainMessage().PHP_EOL;
+    echo $exception->getMessage().PHP_EOL;
 }
 ?>
---EXPECTF--
+--EXPECT--
 2 must not be positive

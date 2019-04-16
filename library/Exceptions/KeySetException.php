@@ -9,14 +9,21 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class KeySetException extends GroupedValidationException
+use function count;
+
+/**
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class KeySetException extends GroupedValidationException implements NonOmissibleException
 {
-    const STRUCTURE = 2;
+    public const STRUCTURE = 'structure';
 
     /**
-     * @var array
+     * {@inheritDoc}
      */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
@@ -32,12 +39,12 @@ class KeySetException extends GroupedValidationException
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function chooseTemplate()
+    protected function chooseTemplate(): string
     {
-        if ($this->getParam('keys')) {
-            return static::STRUCTURE;
+        if (count($this->getChildren()) === 0) {
+            return self::STRUCTURE;
         }
 
         return parent::chooseTemplate();

@@ -9,10 +9,19 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class HexRgbColorException extends ValidationException
+/**
+ * @author Davide Pastore <pasdavide@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class HexRgbColorException extends ValidationException
 {
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
             self::STANDARD => '{{name}} must be a hex RGB color',

@@ -1,7 +1,14 @@
+--CREDITS--
+Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+Henrique Moody <henriquemoody@gmail.com>
+Ivan Zinovyev <vanyazin@gmail.com>
 --TEST--
 keyNested()
 --FILE--
 <?php
+
+declare(strict_types=1);
+
 require 'vendor/autoload.php';
 
 use Respect\Validation\Validator as v;
@@ -24,7 +31,7 @@ var_dump(v::keyNested('foo.bar')->validate($object));
 var_dump(v::keyNested('foo.bar', v::stringType())->validate($object));
 var_dump(v::keyNested('foo.bar.baz', v::notEmpty(), false)->validate($object));
 ?>
---EXPECTF--
+--EXPECT--
 bool(false)
 bool(true)
 bool(true)

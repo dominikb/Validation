@@ -9,100 +9,71 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
+use stdClass;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Consonant
- * @covers Respect\Validation\Exceptions\ConsonantException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\AbstractFilterRule
+ * @covers \Respect\Validation\Rules\Consonant
+ *
+ * @author Danilo Correa <danilosilva87@gmail.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Kleber Hamada Sato <kleberhs007@yahoo.com>
+ * @author Nick Lombard <github@jigsoft.co.za>
  */
-class ConsonantTest extends TestCase
+final class ConsonantTest extends RuleTestCase
 {
     /**
-     * @dataProvider providerForValidConsonants
+     * {@inheritDoc}
      */
-    public function testValidDataWithConsonantsShouldReturnTrue($validConsonants, $additional = '')
+    public function providerForValidInput(): array
     {
-        $validator = new Consonant($additional);
-        $this->assertTrue($validator->validate($validConsonants));
-    }
+        $consonant = new Consonant();
 
-    /**
-     * @dataProvider providerForInvalidConsonants
-     * @expectedException Respect\Validation\Exceptions\ConsonantException
-     */
-    public function testInvalidConsonantsShouldFailAndThrowConsonantException($invalidConsonants, $additional = '')
-    {
-        $validator = new Consonant($additional);
-        $this->assertFalse($validator->validate($invalidConsonants));
-        $this->assertFalse($validator->assert($invalidConsonants));
-    }
-
-    /**
-     * @dataProvider providerForInvalidParams
-     * @expectedException Respect\Validation\Exceptions\ComponentException
-     */
-    public function testInvalidConstructorParamsShouldThrowComponentExceptionUponInstantiation($additional)
-    {
-        $validator = new Consonant($additional);
-    }
-
-    /**
-     * @dataProvider providerAdditionalChars
-     */
-    public function testAdditionalCharsShouldBeRespected($additional, $query)
-    {
-        $validator = new Consonant($additional);
-        $this->assertTrue($validator->validate($query));
-    }
-
-    public function providerAdditionalChars()
-    {
         return [
-            ['!@#$%^&*(){}', '!@#$%^&*(){} bc dfg'],
-            ['[]?+=/\\-_|"\',<>.', "[]?+=/\\-_|\"',<>. \t \n bc dfg"],
+            'Letter "b"' => [$consonant, 'b'],
+            'Letter "c"' => [$consonant, 'c'],
+            'Letter "d"' => [$consonant, 'd'],
+            'Letter "w"' => [$consonant, 'w'],
+            'Letter "y"' => [$consonant, 'y'],
+            'String "bcdfghklmnp"' => [$consonant, 'bcdfghklmnp'],
+            'String with space in the middle "bcdfghklm np"' => [$consonant, 'bcdfghklm np'],
+            'String "qrst"' => [$consonant, 'qrst'],
+            'String with cntrl "\nz\t"' => [$consonant, "\nz\t"],
+            'String "zbcxwyrspq"' => [$consonant, 'zbcxwyrspq'],
+            'Ignoring characters "!@#$%^&*(){}"' => [new Consonant('!@#$%^&*(){}'), '!@#$%^&*(){} bc dfg'],
+            'Ignoring characters "[]?+=/\\-_|"\',<>."' => [
+                new Consonant('[]?+=/\\-_|"\',<>.'), "[]?+=/\\-_|\"',<>. \t \n bc dfg",
+            ],
         ];
     }
 
-    public function providerForInvalidParams()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
-        return [
-            [new \stdClass()],
-            [[]],
-            [0x2],
-        ];
-    }
+        $consonant = new Consonant();
 
-    public function providerForValidConsonants()
-    {
         return [
-            ['b'],
-            ['c'],
-            ['d'],
-            ['w'],
-            ['y'],
-            ['y',''],
-            ['bcdfghklmnp'],
-            ['bcdfghklm np'],
-            ['qrst'],
-            ["\nz\t"],
-            ['zbcxwyrspq'],
-        ];
-    }
-
-    public function providerForInvalidConsonants()
-    {
-        return [
-            [''],
-            [null],
-            ['16'],
-            ['aeiou'],
-            ['a'],
-            ['Foo'],
-            [-50],
-            ['basic'],
+            'Parameter empty' => [$consonant, ''],
+            'Letter "a"' => [$consonant, 'a'],
+            'Parameter "null"' => [$consonant, null],
+            'Number "16"' => [$consonant, '16'],
+            'Alphabet "aeiou"' => [$consonant, 'aeiou'],
+            'String "Foo"' => [$consonant, 'Foo'],
+            'Negative integer "-50"' => [$consonant, -50],
+            'String "basic"' => [$consonant, 'basic'],
+            'Array empty' => [$consonant, []],
+            'Integer' => [$consonant, 10],
+            'Instance stdClass' => [$consonant, new stdClass()],
         ];
     }
 }

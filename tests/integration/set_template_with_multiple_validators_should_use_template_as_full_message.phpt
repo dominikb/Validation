@@ -1,7 +1,12 @@
+--CREDITS--
+Henrique Moody <henriquemoody@gmail.com>
 --TEST--
 setTemplate() with multiple validators should use template as full message
 --FILE--
 <?php
+
+declare(strict_types=1);
+
 require 'vendor/autoload.php';
 
 use Respect\Validation\Exceptions\NestedValidationException;
@@ -13,5 +18,5 @@ try {
     echo $e->getFullMessage();
 }
 ?>
---EXPECTF--
+--EXPECT--
 - "something" is not tasty

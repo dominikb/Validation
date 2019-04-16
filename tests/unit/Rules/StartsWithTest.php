@@ -9,62 +9,53 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\StartsWith
- * @covers Respect\Validation\Exceptions\StartsWithException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\StartsWith
+ *
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Danilo Correa <danilosilva87@gmail.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class StartsWithTest extends TestCase
+final class StartsWithTest extends RuleTestCase
 {
     /**
-     * @dataProvider providerForStartsWith
+     * {@inheritDoc}
      */
-    public function testStartsWith($start, $input)
-    {
-        $v = new StartsWith($start);
-        $this->assertTrue($v->__invoke($input));
-        $this->assertTrue($v->check($input));
-        $this->assertTrue($v->assert($input));
-    }
-
-    /**
-     * @dataProvider providerForNotStartsWith
-     * @expectedException Respect\Validation\Exceptions\StartsWithException
-     */
-    public function testNotStartsWith($start, $input, $caseSensitive = false)
-    {
-        $v = new StartsWith($start, $caseSensitive);
-        $this->assertFalse($v->__invoke($input));
-        $this->assertFalse($v->assert($input));
-    }
-
-    public function providerForStartsWith()
+    public function providerForValidInput(): array
     {
         return [
-            ['foo', ['foo', 'bar']],
-            ['foo', 'FOObarbaz'],
-            ['foo', 'foobarbaz'],
-            ['foo', 'foobazfoo'],
-            ['1', [1, 2, 3]],
-            ['1', ['1', 2, 3], true],
+            [new StartsWith('foo'), ['foo', 'bar']],
+            [new StartsWith('foo') ,'FOObarbaz'],
+            [new StartsWith('foo') , 'foobarbaz'],
+            [new StartsWith('foo') ,'foobazfoo'],
+            [new StartsWith('1'), [1, 2, 3]],
+            [new StartsWith('1', true), ['1', 2, 3]],
         ];
     }
 
-    public function providerForNotStartsWith()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
         return [
-            ['foo', ''],
-            ['bat', ['foo', 'bar']],
-            ['foo', 'barfaabaz'],
-            ['foo', 'FOObarbaz', true],
-            ['foo', 'faabarbaz'],
-            ['foo', 'baabazfaa'],
-            ['foo', 'baafoofaa'],
-            ['1', [1, '1', 3], true],
+            [new StartsWith('foo'), ''],
+            [new StartsWith('bat'), ['foo', 'bar']],
+            [new StartsWith('foo'), 'barfaabaz'],
+            [new StartsWith('foo', true), 'FOObarbaz'],
+            [new StartsWith('foo'), 'faabarbaz'],
+            [new StartsWith('foo'), 'baabazfaa'],
+            [new StartsWith('foo'), 'baafoofaa'],
+            [new StartsWith('1', true), [1, '1', 3]],
         ];
     }
 }

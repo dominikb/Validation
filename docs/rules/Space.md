@@ -1,15 +1,21 @@
 # Space
 
-- `v::space()`
-- `v::space(string $additionalChars)`
+- `Space()`
+- `Space(string ...$additionalChars)`
 
-Accepts only whitespace:
+Validates whether the input contains only whitespaces characters.
 
 ```php
 v::space()->validate('    '); // true
 ```
 
+## Changelog
+
+Version | Description
+--------|-------------
+  0.5.0 | Created
+
 ***
 See also:
 
-  * [Cntrl](Cntrl.md)
+- [Cntrl](Cntrl.md)

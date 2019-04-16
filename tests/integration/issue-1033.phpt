@@ -1,3 +1,5 @@
+--CREDITS--
+Henrique Moody <henriquemoody@gmail.com>
 --DESCRIPTION--
 The previous output was:
 
@@ -8,6 +10,8 @@ The previous output was:
 - "B" must equal 1
 --FILE--
 <?php
+
+declare(strict_types=1);
 
 require 'vendor/autoload.php';
 
@@ -20,8 +24,8 @@ try {
     echo $exception->getFullMessage().PHP_EOL;
 }
 ?>
---EXPECTF--
-- Each item in { "A", "B", "B" } must be valid
-  - "A" must be equals 1
-  - "B" must be equals 1
-  - "B" must be equals 1
+--EXPECT--
+- Each item in `{ "A", "B", "B" }` must be valid
+  - "A" must equal 1
+  - "B" must equal 1
+  - "B" must equal 1

@@ -9,15 +9,27 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
+use Respect\Validation\Test\RuleTestCase;
+use const PHP_INT_MAX;
+
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\FloatType
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\FloatType
+ *
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Reginaldo Junior <76regi@gmail.com>
  */
-class FloatTypeTest extends RuleTestCase
+final class FloatTypeTest extends RuleTestCase
 {
-    public function providerForValidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForValidInput(): array
     {
         $rule = new FloatType();
 
@@ -32,7 +44,10 @@ class FloatTypeTest extends RuleTestCase
         ];
     }
 
-    public function providerForInvalidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
         $rule = new FloatType();
 

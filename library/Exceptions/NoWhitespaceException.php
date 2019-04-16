@@ -9,16 +9,26 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class NoWhitespaceException extends ValidationException
+/**
+ * @author Alexandre Gomes Gaigalas <alexandre@gaigalas.net>
+ * @author Danilo Benevides <danilobenevides01@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class NoWhitespaceException extends ValidationException
 {
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
             self::STANDARD => '{{name}} must not contain whitespace',
         ],
         self::MODE_NEGATIVE => [
-            self::STANDARD => '{{name}} must not not contain whitespace',
+            self::STANDARD => '{{name}} must contain whitespace',
         ],
     ];
 }

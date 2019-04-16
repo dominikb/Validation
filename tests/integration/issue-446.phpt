@@ -1,5 +1,9 @@
+--CREDITS--
+Henrique Moody <henriquemoody@gmail.com>
 --FILE--
 <?php
+
+declare(strict_types=1);
 
 require 'vendor/autoload.php';
 
@@ -20,8 +24,8 @@ try {
     print_r($e->getMessages());
 }
 ?>
---EXPECTF--
+--EXPECT--
 Array
 (
-    [0] => name must have a length between 2 and 32
+    [name] => name must have a length between 2 and 32
 )

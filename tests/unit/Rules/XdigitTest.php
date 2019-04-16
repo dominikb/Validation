@@ -9,81 +9,55 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Xdigit
- * @covers Respect\Validation\Exceptions\XdigitException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\AbstractFilterRule
+ * @covers \Respect\Validation\Rules\Xdigit
+ *
+ * @author Andre Ramaciotti <andre@ramaciotti.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Nick Lombard <github@jigsoft.co.za>
+ * @author Pascal Borreli <pascal@borreli.com>
  */
-class XdigitTest extends TestCase
+final class XdigitTest extends RuleTestCase
 {
-    protected $xdigitsValidator;
-
-    protected function setUp()
-    {
-        $this->xdigitsValidator = new Xdigit();
-    }
-
     /**
-     * @dataProvider providerForXdigit
+     * {@inheritDoc}
      */
-    public function testValidateValidHexasdecimalDigits($input)
-    {
-        $this->assertTrue($this->xdigitsValidator->assert($input));
-        $this->assertTrue($this->xdigitsValidator->check($input));
-        $this->assertTrue($this->xdigitsValidator->validate($input));
-    }
-
-    /**
-     * @dataProvider providerForNotXdigit
-     * @expectedException Respect\Validation\Exceptions\XdigitException
-     */
-    public function testInvalidHexadecimalDigitsShouldThrowXdigitException($input)
-    {
-        $this->assertFalse($this->xdigitsValidator->validate($input));
-        $this->assertFalse($this->xdigitsValidator->assert($input));
-    }
-
-    /**
-     * @dataProvider providerAdditionalChars
-     */
-    public function testAdditionalCharsShouldBeRespected($additional, $query)
-    {
-        $validator = new Xdigit($additional);
-        $this->assertTrue($validator->validate($query));
-    }
-
-    public function providerAdditionalChars()
+    public function providerForValidInput(): array
     {
         return [
-            ['!@#$%^&*(){} ', '!@#$%^&*(){} abc 123'],
-            ["[]?+=/\\-_|\"',<>. \t\n", "[]?+=/\\-_|\"',<>. \t \n abc 123"],
+            [new Xdigit(), 'FFF'],
+            [new Xdigit(), '15'],
+            [new Xdigit(), 'DE12FA'],
+            [new Xdigit(), '1234567890abcdef'],
+            [new Xdigit(), 443],
+            [new Xdigit(), 0x123],
+            [new Xdigit('!@#$%^&*(){} '), '!@#$%^&*(){} abc 123'],
+            [new Xdigit("[]?+=/\\-_|\"',<>. \t\n"), "[]?+=/\\-_|\"',<>. \t \n abc 123"],
         ];
     }
 
-    public function providerForXdigit()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
         return [
-            ['FFF'],
-            ['15'],
-            ['DE12FA'],
-            ['1234567890abcdef'],
-            [0x123],
-        ];
-    }
-
-    public function providerForNotXdigit()
-    {
-        return [
-            [''],
-            [null],
-            ['j'],
-            [' '],
-            ['Foo'],
-            ['1.5'],
+            [new Xdigit(), ''],
+            [new Xdigit(), null],
+            [new Xdigit(), 'j'],
+            [new Xdigit(), ' '],
+            [new Xdigit(), 'Foo'],
+            [new Xdigit(), '1.5'],
         ];
     }
 }

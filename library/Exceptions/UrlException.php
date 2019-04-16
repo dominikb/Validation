@@ -9,10 +9,18 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class UrlException extends ValidationException
+/**
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class UrlException extends ValidationException
 {
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
             self::STANDARD => '{{name}} must be a URL',

@@ -9,13 +9,20 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Exceptions;
 
-class OptionalException extends ValidationException
+/**
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ */
+final class OptionalException extends ValidationException
 {
-    const STANDARD = 0;
-    const NAMED = 1;
+    public const NAMED = 'named';
 
+    /**
+     * {@inheritDoc}
+     */
     public static $defaultTemplates = [
         self::MODE_DEFAULT => [
             self::STANDARD => 'The value must be optional',
@@ -27,8 +34,8 @@ class OptionalException extends ValidationException
         ],
     ];
 
-    public function chooseTemplate()
+    protected function chooseTemplate(): string
     {
-        return $this->getName() == '' ? static::STANDARD : static::NAMED;
+        return $this->getParam('name') ? self::NAMED : self::STANDARD;
     }
 }

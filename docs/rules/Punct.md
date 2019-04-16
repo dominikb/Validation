@@ -1,17 +1,23 @@
 # Punct
 
-- `v::punct()`
-- `v::punct(string $additionalChars)`
+- `Punct()`
+- `Punct(string ...$additionalChars)`
 
-Accepts only punctuation characters:
+Validates whether the input composed by only punctuation characters.
 
 ```php
 v::punct()->validate('&,.;[]'); // true
 ```
 
+## Changelog
+
+Version | Description
+--------|-------------
+  0.5.0 | Created
+
 ***
 See also:
 
-  * [Cntrl](Cntrl.md)
-  * [Graph](Graph.md)
-  * [Prnt](Prnt.md)
+- [Cntrl](Cntrl.md)
+- [Graph](Graph.md)
+- [Printable](Printable.md)

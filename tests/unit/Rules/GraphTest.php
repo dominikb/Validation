@@ -9,92 +9,64 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\Graph
- * @covers Respect\Validation\Exceptions\GraphException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\AbstractFilterRule
+ * @covers \Respect\Validation\Rules\Graph
+ *
+ * @author Andre Ramaciotti <andre@ramaciotti.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Nick Lombard <github@jigsoft.co.za>
+ * @author Pascal Borreli <pascal@borreli.com>
  */
-class GraphTest extends TestCase
+final class GraphTest extends RuleTestCase
 {
     /**
-     * @dataProvider providerForValidGraph
+     * @inheritDoc
      */
-    public function testValidDataWithGraphCharsShouldReturnTrue($validGraph, $additional = '')
+    public function providerForValidInput(): array
     {
-        $validator = new Graph($additional);
-        $this->assertTrue($validator->validate($validGraph));
-    }
+        $graph = new Graph();
 
-    /**
-     * @dataProvider providerForInvalidGraph
-     * @expectedException Respect\Validation\Exceptions\GraphException
-     */
-    public function testInvalidGraphShouldFailAndThrowGraphException($invalidGraph, $additional = '')
-    {
-        $validator = new Graph($additional);
-        $this->assertFalse($validator->validate($invalidGraph));
-        $this->assertFalse($validator->assert($invalidGraph));
-    }
-
-    /**
-     * @dataProvider providerForInvalidParams
-     * @expectedException Respect\Validation\Exceptions\ComponentException
-     */
-    public function testInvalidConstructorParamsShouldThrowComponentExceptionUponInstantiation($additional)
-    {
-        $validator = new Graph($additional);
-    }
-
-    /**
-     * @dataProvider providerAdditionalChars
-     */
-    public function testAdditionalCharsShouldBeRespected($additional, $query)
-    {
-        $validator = new Graph($additional);
-        $this->assertTrue($validator->validate($query));
-    }
-
-    public function providerAdditionalChars()
-    {
         return [
-            [' ', '!@#$%^&*(){} abc 123'],
-            [" \t\n", "[]?+=/\\-_|\"',<>. \t \n abc 123"],
+            'String with special characters "LKA#@%.54"' => [$graph, 'LKA#@%.54'],
+            'String "foobar"' => [$graph, 'foobar'],
+            'String 16-50' => [$graph, '16-50'],
+            'String 123' => [$graph, '123'],
+            'String with special characters "#$%&*_"' => [$graph, '#$%&*_'],
+            'Ignoring control characters "\n"' => [new Graph("\n"), "#$%&*_\n~"],
+            'Ignoring control characters "\n#\t&\r"' => [new Graph("\n#\t&\r"), "#$%&*_\n~\t**\r"],
+            'Ignoring character "_"' => [new Graph('_'), 'abc\#$%&*_'],
+            'Ignoring characters "# $"' => [new Graph('# $'), '#$%&*_'],
+            'Ignoring character with space' => [new Graph(' '), '!@#$%^&*(){} abc 123'],
+            'Ignoring control characters " \t\n"' => [new Graph(" \t\n"), "[]?+=/\\-_|\"',<>. \t \n abc 123"],
         ];
     }
 
-    public function providerForInvalidParams()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
-        return [
-            [new \stdClass()],
-            [[]],
-            [0x2],
-        ];
-    }
+        $graph = new Graph();
 
-    public function providerForValidGraph()
-    {
         return [
-            ['LKA#@%.54'],
-            ['foobar'],
-            ['16-50'],
-            ['123'],
-            ['#$%&*_'],
-        ];
-    }
-
-    public function providerForInvalidGraph()
-    {
-        return [
-            [''],
-            [null],
-            ["foo\nbar"],
-            ["foo\tbar"],
-            ['foo bar'],
-            [' '],
+            'String empty' => [$graph, ''],
+            'Parameter null' => [$graph, null],
+            'String with "\n"' => [$graph, "foo\nbar"],
+            'String with "\t"' => [$graph, "foo\tbar"],
+            'String with "foo bar"' => [$graph, 'foo bar'],
+            'String with space' => [$graph, ' '],
+            'Igonring space' => [new Graph(' '), "@__§¬¬¬\n"],
+            'Ignoring control characters "foo\nbar"' => [new Graph("foo\nbar"), "foo\nbar\ree"],
         ];
     }
 }

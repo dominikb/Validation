@@ -1,5 +1,12 @@
+--CREDITS--
+Edson Lima <dddwebdeveloper@gmail.com>
+Henrique Moody <henriquemoody@gmail.com>
+Ian Nisbet <ian@glutenite.co.uk>
 --FILE--
 <?php
+
+declare(strict_types=1);
+
 require 'vendor/autoload.php';
 
 use Respect\Validation\Exceptions\EqualsException;
@@ -13,8 +20,8 @@ $data = [
 try {
     v::keyValue('password', 'equals', 'password_confirmation')->check($data);
 } catch (EqualsException $e) {
-    echo $e->getMainMessage();
+    echo $e->getMessage();
 }
 ?>
---EXPECTF--
-password must be equals "password_confirmation"
+--EXPECT--
+password must equal "password_confirmation"

@@ -9,12 +9,25 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-class Vowel extends AbstractRegexRule
+use function preg_match;
+
+/**
+ * Validates whether the input contains only vowels.
+ *
+ * @author Henrique Moody <henriquemoody@gmail.com>
+ * @author Nick Lombard <github@jigsoft.co.za>
+ */
+final class Vowel extends AbstractFilterRule
 {
-    protected function getPregFormat()
+    /**
+     * {@inheritDoc}
+     */
+    protected function validateFilteredInput(string $input): bool
     {
-        return '/^(\s|[aeiouAEIOU])*$/';
+        return preg_match('/^[aeiouAEIOU]+$/', $input) > 0;
     }
 }

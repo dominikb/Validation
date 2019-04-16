@@ -9,68 +9,64 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use Respect\Validation\Test\RuleTestCase;
+use stdClass;
 
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\HexRgbColor
- * @covers Respect\Validation\Exceptions\HexRgbColorException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\HexRgbColor
+ *
+ * @author Davide Pastore <pasdavide@gmail.com>
+ * @author Gabriel Caruso <carusogabriel34@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class HexRgbColorTest extends TestCase
+final class HexRgbColorTest extends RuleTestCase
 {
     /**
-     * @dataProvider providerForValidHexRgbColor
+     * {@inheritDoc}
      */
-    public function testHexRgbColorValuesONLYShouldReturnTrue($validHexRgbColor)
+    public function providerForValidInput(): array
     {
-        $validator = new HexRgbColor();
+        $sut = new HexRgbColor();
 
-        $this->assertTrue($validator->validate($validHexRgbColor));
-    }
-
-    /**
-     * @dataProvider providerForInvalidHexRgbColor
-     */
-    public function testInvalidHexRgbColorValuesShouldReturnFalse($invalidHexRgbColor)
-    {
-        $validator = new HexRgbColor();
-
-        $this->assertFalse($validator->validate($invalidHexRgbColor));
-    }
-
-    public function providerForValidHexRgbColor()
-    {
         return [
-            ['#000'],
-            ['#00000F'],
-            ['#123'],
-            ['#123456'],
-            ['#FFFFFF'],
-            ['123123'],
-            ['FFFFFF'],
+            [$sut, '#000'],
+            [$sut, '#00000F'],
+            [$sut, '#123'],
+            [$sut, '#123456'],
+            [$sut, '#FFFFFF'],
+            [$sut, '123123'],
+            [$sut, 'FFFFFF'],
+            [$sut, 443],
         ];
     }
 
-    public function providerForInvalidHexRgbColor()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
+        $sut = new HexRgbColor();
+
         return [
-            ['#0'],
-            ['#0000G0'],
-            ['#0FG'],
-            ['#1234'],
-            ['#AAAAAA1'],
-            ['#S'],
-            ['1234'],
-            ['foo'],
-            [0x39F],
-            [05],
-            [1],
-            [443],
-            [[]],
-            [new \stdClass()],
-            [null],
+            [$sut, '#0'],
+            [$sut, '#0000G0'],
+            [$sut, '#0FG'],
+            [$sut, '#1234'],
+            [$sut, '#AAAAAA1'],
+            [$sut, '#S'],
+            [$sut, '1234'],
+            [$sut, 'foo'],
+            [$sut, 05],
+            [$sut, 1],
+            [$sut, []],
+            [$sut, new stdClass()],
+            [$sut, null],
         ];
     }
 }

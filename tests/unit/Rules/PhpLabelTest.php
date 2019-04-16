@@ -9,16 +9,33 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Respect\Validation\Rules;
 
+use DateTime;
+use Respect\Validation\Test\RuleTestCase;
+use stdClass;
+use function mb_strtoupper;
+use function mt_rand;
+use function random_int;
+use function uniqid;
+
 /**
- * @group  rule
- * @covers Respect\Validation\Rules\PhpLabel
- * @covers Respect\Validation\Exceptions\PhpLabelException
+ * @group rule
+ *
+ * @covers \Respect\Validation\Rules\PhpLabel
+ *
+ * @author Danilo Correa <danilosilva87@gmail.com>
+ * @author Emmerson Siqueira <emmersonsiqueira@gmail.com>
+ * @author Henrique Moody <henriquemoody@gmail.com>
  */
-class PhpLabelTest extends RuleTestCase
+final class PhpLabelTest extends RuleTestCase
 {
-    public function providerForValidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForValidInput(): array
     {
         $rule = new PhpLabel();
 
@@ -28,12 +45,15 @@ class PhpLabelTest extends RuleTestCase
             [$rule, 'f00'],
             [$rule, uniqid('_')],
             [$rule, uniqid('a')],
-            [$rule, strtoupper(uniqid('_'))],
-            [$rule, strtoupper(uniqid('a'))],
+            [$rule, mb_strtoupper(uniqid('_'))],
+            [$rule, mb_strtoupper(uniqid('a'))],
         ];
     }
 
-    public function providerForInvalidInput()
+    /**
+     * {@inheritDoc}
+     */
+    public function providerForInvalidInput(): array
     {
         $rule = new PhpLabel();
 
@@ -49,14 +69,14 @@ class PhpLabelTest extends RuleTestCase
             [$rule, 'f o o'],
             [$rule, '0ne'],
             [$rule, '0_ne'],
-            [$rule, uniqid(mt_rand(0, 9))],
+            [$rule, uniqid((string) random_int(0, 9))],
             [$rule, null],
             [$rule, mt_rand()],
             [$rule, 0],
             [$rule, 1],
             [$rule, []],
-            [$rule, new \StdClass()],
-            [$rule, new \DateTime()],
+            [$rule, new stdClass()],
+            [$rule, new DateTime()],
         ];
     }
 }
