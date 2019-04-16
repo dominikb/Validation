@@ -267,11 +267,31 @@ class MyRule extends AbstractRule
 }
 ```
 
+If you do want Validation to execute your rule (or rules) in the chain, you must
+use `v::with()` passing your rule's namespace as an argument:
+
+```php
+v::with('My\\Validation\\Rules\\');
+v::myRule(); // Try to load "My\Validation\Rules\MyRule" if any
+```
+
+By default `with()` appends the given prefix, but you can change this behavior
+in order to overwrite default rules:
+
+```php
+v::with('My\\Validation\\Rules', true);
+v::alnum(); // Try to use "My\Validation\Rules\Alnum" if any
+```
+
+If you're using the `assert()` or `check()` methods you also need to create an
+Exception to declare the messages returned:
+
 Each rule must have an Exception to go with it. Exceptions should be named
 with the name of the rule followed by the word Exception. The process of creating
 an Exception is similar to creating a rule but there are no methods in the
 Exception class. Instead, you create one static property that includes an
 array with the information below:
+
 
 ```php
 namespace My\Validation\Exceptions;
